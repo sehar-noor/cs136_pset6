@@ -35,6 +35,7 @@ class VCG:
         # higher ids
         random.shuffle(valid_bids)
         valid_bids.sort(key=lambda b: b[1], reverse=True)
+        bids.sort(key=lambda b: b[1], reverse=True)
 
         num_slots = len(slot_clicks)
         allocated_bids = valid_bids[:num_slots]
@@ -43,22 +44,21 @@ class VCG:
 
         (allocation, just_bids) = list(zip(*allocated_bids))
 
-        # TODO: You just have to implement this function
+        #TOTAL PAYMENTS FUNCTIONS
         def total_payment(k):
-            """
-            Total payment for a bidder in slot k.
-            """
             c = slot_clicks
             n = len(allocation)
-
-            # TODO: Compute the payment and return it.
+            if k < n and c[k]>0:
+                res_bids = [(index, bid) for index, bid in bids]
+                res_bids = [(bidder, max(bid_value, reserve)) for bidder, bid_value in res_bids]
+                return sum([bid[1] for bid in res_bids[k+1:]])
 
         def norm(totals):
             """Normalize total payments by the clicks in each slot"""
             return [x_y[0]/x_y[1] for x_y in zip(totals, slot_clicks)]
 
-        per_click_payments = norm(
-            [total_payment(k) for k in range(len(allocation))])
+
+        per_click_payments = norm([total_payment(k) for k in range(len(allocation))])
 
         return (list(allocation), per_click_payments)
 
