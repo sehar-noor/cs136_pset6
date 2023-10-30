@@ -60,13 +60,19 @@ class snasbb:
 
         returns a list of utilities per slot.
         """
-        num_slots = max(1, history.n_agents)
         prev_round = history.round(t-1)
+        clicks = prev_round.clicks
+        num_slots = max(1, len(clicks))
+        
         other_bids = [a_id_b for a_id_b in prev_round.bids if a_id_b[0] != self.id]
         other_bids.append((self.id, 0)) # add back in the null bid corresponding to you
         sorted_bids = sorted(other_bids, key = lambda x: x[1], reverse = True)
-        clicks = prev_round.clicks
+        
+        # if len(clicks) < num_slots:
+        #     for _ in range(num_slots - len(clicks)):
+        #         clicks.append(0)
 
+        # print("CLICKS: ", clicks, "NUM_SLOTS: ", num_slots, "SORTED_BIDS: ", sorted_bids)
         utilities = [clicks[j] * (self.value - max(sorted_bids[j][1], reserve)) for j in range(num_slots)]
         # print("clicks per: ", clicks, "sorted bids is: ", sorted_bids, "t is: ", t)
         return utilities
