@@ -4,6 +4,7 @@ import sys
 
 from gsp import GSP
 from util import argmax_index
+import math
 
 class snas_BBAgent:
     """Balanced bidding agent"""
@@ -40,6 +41,16 @@ class snas_BBAgent:
 #        sys.stdout.write("slot info: %s\n" % info)
         return info
 
+    # def clicks_per_position(self, t, num_slots):
+    #     """
+    #     From the pset, we have a closed-form expression for clicks per
+    #     position given the period. This is implemented here.
+
+    #     input: period (t), num_position
+    #     output: list of clicks per position, with position i at index i - 1.
+    #     """
+    #     clicks_in_round_1 = round(30 * math.cos(math.pi * t / 24) + 50)
+    #     return [round(.75 ** (j) * clicks_in_round_1) for j in range(num_slots)]
 
     def expected_utils(self, t, history, reserve):
         """
@@ -49,10 +60,15 @@ class snas_BBAgent:
 
         returns a list of utilities per slot.
         """
-        # TODO: Fill this in
-        utilities = []   # Change this
+        num_slots = max(1, history.n_agents)
+        prev_round = history.round(t-1)
+        other_bids = [a_id_b for a_id_b in prev_round.bids if a_id_b[0] != self.id]
+        other_bids.append((self.id, 0)) # add back in the null bid corresponding to you
+        sorted_bids = sorted(other_bids, key = lambda x: x[1], reverse = True)
+        clicks = prev_round.clicks
 
-        
+        utilities = [clicks[j] * (self.value - max(sorted_bids[j][1], reserve)) for j in range(num_slots)]
+        # print("clicks per: ", clicks, "sorted bids is: ", sorted_bids, "t is: ", t)
         return utilities
 
     def target_slot(self, t, history, reserve):
@@ -79,10 +95,23 @@ class snas_BBAgent:
         # If s*_j is the top slot, bid the value v_j
 
         prev_round = history.round(t-1)
+        clicks = prev_round.clicks
         (slot, min_bid, max_bid) = self.target_slot(t, history, reserve)
 
-        # TODO: Fill this in.
-        bid = 0  # change this
+        # If Not expecting to win, bid your value:
+        if min_bid > self.value:
+            bid = self.value
+        # Elif Not going for top, 
+        elif slot > 0:
+            # num_slots = slot + 1
+            # pos = clicks
+            # print("CLICKS AND SLOT ARE: ", clicks, slot, clicks[slot-1], self.value, min_bid)
+            # print("SLOT IS TOO HIGH! ", "TARGET SLOT IS: ", slot, "ID IS: ", self.id, "VALUE IS: ", self.value)
+            bid = self.value - (clicks[slot] / clicks[slot-1])*(self.value - min_bid)
+        # Else, Going for top,
+        else:
+            # print("GOING FOR THE TOP! ", "TARGET SLOT IS: ", slot, "ID IS: ", self.id, "VALUE IS: ", self.value)
+            bid = self.value
         
         return bid
 
