@@ -114,9 +114,9 @@ class snasbb:
             # print("CLICKS AND SLOT ARE: ", clicks, slot, clicks[slot-1], self.value, min_bid)
             # print("SLOT IS TOO HIGH! ", "TARGET SLOT IS: ", slot, "ID IS: ", self.id, "VALUE IS: ", self.value)
             bid = self.value - (clicks[slot] / clicks[slot-1])*(self.value - min_bid)
-            if bid < reserve AND reserve < self.value:
+            if bid < reserve and reserve < self.value:
                 bid = reserve
-            elif bid < reserve AND reserve > self.value:
+            elif bid < reserve and reserve > self.value:
                 bid = 0        
         
         # Else, Going for top,
