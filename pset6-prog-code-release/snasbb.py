@@ -6,7 +6,7 @@ from gsp import GSP
 from util import argmax_index
 import math
 
-class snas_BBAgent:
+class snasbb:
     """Balanced bidding agent"""
     def __init__(self, id, value, budget):
         self.id = id
@@ -36,7 +36,7 @@ class snas_BBAgent:
             if max == None:
                 max = 2 * min
             return (s, min, max)
-            
+
         info = list(map(compute, list(range(len(clicks)))))
 #        sys.stdout.write("slot info: %s\n" % info)
         return info
@@ -101,7 +101,7 @@ class snas_BBAgent:
         # If Not expecting to win, bid your value:
         if min_bid > self.value:
             bid = self.value
-        # Elif Not going for top, 
+        # Elif Not going for top,
         elif slot > 0:
             # num_slots = slot + 1
             # pos = clicks
@@ -112,7 +112,7 @@ class snas_BBAgent:
         else:
             # print("GOING FOR THE TOP! ", "TARGET SLOT IS: ", slot, "ID IS: ", self.id, "VALUE IS: ", self.value)
             bid = self.value
-        
+
         return bid
 
     def __repr__(self):

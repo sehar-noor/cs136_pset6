@@ -22,6 +22,7 @@ from history import History
 from stats import Stats
 
 #from bbagent import BBAgent
+from snasbb import snasbb
 #from truthfulagent import TruthfulAgent
 
 from util import argmax_index, shuffled, mean, stddev
@@ -47,8 +48,8 @@ def sim(config):
     # TODO: Create agents here
     agents = init_agents(config)
     # Uncomment to print agents.
-    #for a in agents:
-    #    logging.info(a)
+    for a in agents:
+        logging.info(a)
 
     n = len(agents)
     by_id = dict((a.id, a) for a in agents)
@@ -381,6 +382,6 @@ def main(args):
         #print a,"'s added values is", av_value[a.id]
 
 
-
+    print(m)
 if __name__ == "__main__":
     main(sys.argv)
