@@ -35,30 +35,34 @@ class VCG:
         # higher ids
         random.shuffle(valid_bids)
         valid_bids.sort(key=lambda b: b[1], reverse=True)
-        bids.sort(key=lambda b: b[1], reverse=True)
 
         num_slots = len(slot_clicks)
         allocated_bids = valid_bids[:num_slots]
         if len(allocated_bids) == 0:
             return ([], [])
 
-        (allocation, just_bids) = list(zip(*allocated_bids))
+        (agents, all_bids) = list(zip(*sorted(bids, key=lambda x: x[1], reverse=True)))
+        (allocation, just_bids) = list(zip(*sorted(allocated_bids, key=lambda x: x[1], reverse=True)))
 
-        #TOTAL PAYMENTS FUNCTIONS
+        # Payments function
         def total_payment(k):
             c = slot_clicks
             n = len(allocation)
-            if k < n and c[k]>0:
-                res_bids = [(index, bid) for index, bid in bids]
-                res_bids = [(bidder, max(bid_value, reserve)) for bidder, bid_value in res_bids]
-                return sum([bid[1] for bid in res_bids[k+1:]])
+            if k < n:
+                without_bidder = [max(b, reserve) for b in just_bids[:k]] + [max(b, reserve) for b in just_bids[k+1:]]
+                # Using max to ensure next_bid is at least the reserve
+                next_bid = next(max(bid, reserve) for bid in reversed(all_bids) if bid not in without_bidder)
+                without_bidder.append(next_bid)
+                utility_without = sum(without_bidder[i] * c[i] for i in range(len(just_bids)))
+                utility_with = sum(max(just_bids[i], reserve) * c[i] for i in range(len(just_bids)) if i != k)
+                return utility_without - utility_with
 
         def norm(totals):
             """Normalize total payments by the clicks in each slot"""
             return [x_y[0]/x_y[1] for x_y in zip(totals, slot_clicks)]
 
-
-        per_click_payments = norm([total_payment(k) for k in range(len(allocation))])
+        per_click_payments = norm(
+            [total_payment(k) for k in range(len(allocation))])
 
         return (list(allocation), per_click_payments)
 
